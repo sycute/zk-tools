@@ -1,0 +1,45 @@
+[package]
+name = "psw-gift"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ark-bn254 = "0.5.0"
+ark-circom = { version = "0.5.0" }
+ark-crypto-primitives-macros = "0.5.0"
+ark-crypto-primitives = { version = "0.5.0", default-features = false, features = [
+    "crh",
+    "r1cs",
+    "merkle_tree",
+    "parallel",
+] }
+ark-ff = { version = "0.5.0", default-features = false }
+ark-ec = { version = "0.5.0", default-features = false }
+ark-std = { version = "0.5.0", default-features = false }
+ark-relations = { version = "0.5.0", default-features = false }
+ark-groth16 = "0.5.0"
+ark-serialize = { version = "0.5.0", default-features = false, features = [
+    "derive",
+] }
+ark-r1cs-std = { version = "0.5.0", default-features = false }
+ark-snark = { version = "0.5.0", default-features = false }
+
+wasmer = { version = "4.4.0", default-features = false }
+
+
+# [dependencies.wasmer-wasix]
+# version = "0.28.0"
+# default-features = false
+
+hex = "0.4.3"
+tokio = { version = "1.42.0", features = ["macros", "rt-multi-thread"] }
+salvo = { version = "0.63.0", features = ["test"] }
+shuttle-salvo = "0.49.0"
+shuttle-runtime = "0.49.0"
+tracing = "0.1.41"
+# tracing-subscriber = "0.3.19"
+# serde = { version = "1.0.217", features = ["serde_derive", "derive"] }
+# serde_json = "1.0.135"
+
+sui_sdk = { git = "https://github.com/mystenlabs/sui", package = "sui-sdk" }
+anyhow = "1.0.95"
