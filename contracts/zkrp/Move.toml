@@ -1,8 +1,10 @@
 [package]
 name = "zkrp"
-edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
-# license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
-# authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
+edition = "2024.beta"
+license = "Apache 2.0"
+authors = ["sycute (usocute@foxmail.com)"]
+published-testnet = "0xd881a399b170c8a0af91053bd26824281b19d65f0cdbdc4dc6f23586a3f6fe8d"
+record-testnet = "0x80011863aba3e88fb5f975ef124bd3bf3340398625a9372b52d583d012bcac17"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
@@ -34,4 +36,3 @@ zkrp = "0x0"
 # The dev-addresses section allows overwriting named addresses for the `--test`
 # and `--dev` modes.
 # alice = "0xB0B"
-
