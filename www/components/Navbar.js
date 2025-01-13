@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { ConnectButton } from '@mysten/dapp-kit';
 const nav = [
   {
     title: "SEND",
@@ -30,7 +30,9 @@ const Navbar = () => {
           ))}
         </ul>
       </nav>
-      <ConnectButton connectText="连接钱包" style={{ color: "red" }} />
+      <ConnectButton connectText="连接钱包"  />
     </header>
   );
 };
+
+export default Navbar;
