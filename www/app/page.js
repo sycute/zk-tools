@@ -1,8 +1,10 @@
-"use client"
+"use client";
 import Navbar from "@/components/Navbar.js";
-import { Button ,Drawer} from "antd";
+import { Button, Drawer } from "antd";
 import { useState } from "react";
 // 修改元数据
+
+import DrawBody from "@/components/drawBody.js";
 
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
@@ -19,14 +21,20 @@ export default function Home() {
         <div>Create a Stash</div>
         <div>Choose one or more assets to send in the stash.</div>
         <div>
-          <Button type="primary" onClick={showDrawer} className="mr-3" >Choose Coins</Button>
+          <Button type="primary" onClick={showDrawer} className="mr-3">
+            Choose Coins
+          </Button>
           <Button>Choose Nfts</Button>
         </div>
       </div>
-      <Drawer style={{borderRadius:'10px 0 0 10px'}} styles={{header:{display:'none'}}}  onClose={onClose} open={open}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+      <Drawer
+        style={{ borderRadius: "10px 0 0 10px" }}
+        styles={{ header: { display: "none" } }}
+        width='500px'
+        onClose={onClose}
+        open={open}
+      >
+        <DrawBody />
       </Drawer>
     </div>
   );

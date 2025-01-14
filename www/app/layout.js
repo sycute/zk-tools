@@ -12,18 +12,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-black">
-        {/* <React.StrictMode>
-          <QueryClientProvider client={queryClient}>
-            <SuiClientProvider
-              networks={networkConfig}
-              defaultNetwork="testnet"
-            >
-              <WalletProvider autoConnect>
-           
-              </WalletProvider>
-            </SuiClientProvider>
-          </QueryClientProvider>
-        </React.StrictMode> */}
         <Provider> {children}</Provider>
       </body>
     </html>
