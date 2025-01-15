@@ -8,14 +8,16 @@ import {
 } from "@mysten/dapp-kit";
 import { useEffect, useState } from "react";
 import { useCoinBalances } from "@/lib/useUserBalance";
-import { Button, Checkbox, Form, Input } from "antd";
-const DrawBody = () => {
+import { Button, Checkbox, Form, Input, InputNumber } from "antd";
+const DrawBody = (props) => {
   const client = useSuiClient();
   const [coinTypes, setCoinTypes] = useState([]);
   const [coinInfo, setCoinInfo] = useState({});
   const [editStates, setEditStates] = useState([]); // 存储每个元素是否处于编辑状态
+  const [chosedCoin, setChosedCoin] = useState({});
   const currentAccount = useCurrentAccount();
   const [form] = Form.useForm();
+
   useEffect(() => {
     const getTypes = async () => {
       // 获取所有CoinType
@@ -62,10 +64,10 @@ const DrawBody = () => {
     setEditStates(coinTypes.map(() => false));
   }, [coinTypes]);
 
-  //   useEffect(() => {
-  //     console.log(coinInfo);
-  //     console.log(coinTypes);
-  //   }, [coinInfo]);
+  // 当coinInfo改变时传递到父组件
+  useEffect(() => {
+    props.getCoinInfo(coinInfo);
+  }, [coinInfo]);
 
   // 切换到编辑模式
   const handleEdit = (index) => {
@@ -73,26 +75,61 @@ const DrawBody = () => {
       prev.map((editState, i) => (i === index ? true : editState))
     );
   };
-  function checkNaN(value) {
-    return Number.isNaN(value) ? 0 : value;
-  }
   // 手动触发验证
   const handleBlur = () => {
     form.validateFields();
   };
+
+  // 取消
+  const cancel = () => {
+    console.log("取消");
+  };
+
+  const submit = () => {
+    console.log("确认");
+  };
+
+  const handleChange = (type, value) => {
+    // 保存数据
+    const chosed = { ...chosedCoin, [type]: value };
+
+    // 将值传给父组件
+    props.getChosedCoin(chosed);
+    // 更新本地数值
+    setChosedCoin(chosed);
+  };
+
+  //   多位小数处理
+  function getFullNum(num) {
+    //处理非数字
+    if (isNaN(num)) {
+      return num;
+    }
+    //处理不需要转换的数字
+    var str = "" + num;
+    if (!/e/i.test(str)) {
+      return num;
+    }
+    return num.toFixed(20).replace(/\.?0+$/, "");
+  }
+  function checkNaN(value) {
+    return Number.isNaN(value) ? 0 : value;
+  }
   return (
-    <div className="w-full h-full flex flex-col justify-start items-center">
+    <div className="w-full h-full flex flex-col justify-start items-center relative">
       {/* 标题 */}
       <div className="text-4xl font-extrabold mb-4">Choose coins</div>
       {/* 选择栏 */}
       <div className="w-full   bg-slate-100 rounded-3xl p-4">
-        <Form>
+        <Form form={form}>
           {coinTypes.map((item, index) => {
-            console.log(
-              typeof (item?.balance - 0) /
-                10 ** coinInfo[item.type]?.decimals ==
-                "NaN"
-            );
+            function getMax() {
+              const balance = checkNaN(
+                (item?.balance - 0) / 10 ** coinInfo[item.type]?.decimals
+              );
+              console.log(balance);
+              return balance;
+            }
 
             return (
               <div
@@ -110,32 +147,52 @@ const DrawBody = () => {
 
                 <div className="h-14 flex-grow flex flex-col justify-start">
                   {/* 标题 */}
-                  {editStates[index] ? (
-                    <Form.Item
-                      name={item.type}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please input your username!",
-                        },
-                      ]}
-                      className="mb-3"
-                    >
-                      <Input onBlur={handleBlur} />
-                    </Form.Item>
-                  ) : (
-                    <div
-                      className="text-xl font-bold cursor-pointer"
-                      onClick={() => handleEdit(index)}
-                    >
-                      {item.type}
-                    </div>
-                  )}
+                  <div className="h-8 mb-4">
+                    {editStates[index] ? (
+                      <Form.Item
+                        name={item.type}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please input number!",
+                          },
+                          {
+                            max: getMax(),
+                            transform: (value) => Number(value),
+                            message: "Amount exceeds maximum available balance",
+                          },
+                          {
+                            min: 0,
+                            transform: (value) => Number(value),
+                            message: "Invalid amount",
+                          },
+                        ]}
+                        className="mb-3 m-0 p-0"
+                      >
+                        <InputNumber
+                          className="w-full"
+                          onChange={(e) => {
+                            handleChange(item.type, e);
+                          }}
+                          onBlur={handleBlur}
+                        />
+                      </Form.Item>
+                    ) : (
+                      <div
+                        className="text-xl font-bold cursor-pointer"
+                        onClick={() => handleEdit(index)}
+                      >
+                        {item.type}
+                      </div>
+                    )}
+                  </div>
 
                   {/* 余额 */}
                   <div className="text-sm text-gray-500">
-                    {checkNaN(
-                      (item.balance - 0) / 10 ** coinInfo[item.type]?.decimals
+                    {getFullNum(
+                      checkNaN(
+                        (item.balance - 0) / 10 ** coinInfo[item.type]?.decimals
+                      )
                     )}
                   </div>
                 </div>
@@ -143,6 +200,22 @@ const DrawBody = () => {
             );
           })}
         </Form>
+      </div>
+
+      {/* 底部按钮 */}
+      <div className="w-full flex justify-center items-center absolute bottom-4">
+        <button
+          className="flex-1 h-10 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-sm font-medium transition-colors mr-4"
+          onClick={cancel}
+        >
+          CANCEL
+        </button>
+        <button
+          className="flex-1 h-10 rounded-full bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors"
+          onClick={submit}
+        >
+          DONE
+        </button>
       </div>
     </div>
   );

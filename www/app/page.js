@@ -8,33 +8,88 @@ import DrawBody from "@/components/drawBody.js";
 
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
+  const [coinInfo, setCoinInfo] = useState({});
+  const [chosedCoin, setChosedCoin] = useState({});
   const showDrawer = () => {
     setOpen(true);
   };
   const onClose = () => {
     setOpen(false);
   };
+
+  // 从列表处接收选择数据
+  const getChosedCoin = (val) => {
+    setChosedCoin(val);
+  };
+
+  // 接收代币数据 TODO：其实也可以封装请求然后这里再请求一次
+  const getCoinInfo = (val) => {
+    setCoinInfo(val);
+  };
+
   return (
     <div className="h-screen bg-white m-2 rounded-2xl relative">
       <Navbar />
-      <div className="w-3/4  h-96 absolute left-1/2 translate-x-[-50%] top-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center">
-        <div>Create a Stash</div>
-        <div>Choose one or more assets to send in the stash.</div>
-        <div>
-          <Button type="primary" onClick={showDrawer} className="mr-3">
-            Choose Coins
-          </Button>
-          <Button>Choose Nfts</Button>
+      {/* 选择Coin */}
+      <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto mt-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center">
+        <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">Create a Stash</div>
+        {Object.keys(chosedCoin).length == 0 && (
+          <div>Choose one or more assets to send in the stash.</div>
+        )}
+        {Object.keys(chosedCoin).length > 0 && (
+          <div className="bg-black rounded-3xl p-4 w-full">
+            <div className="space-y-4">
+              {Object.keys(chosedCoin).map((item) => {
+                // {[1,2,3].map((item) => {
+                // 选择结果列表
+                return (
+                  <div className="flex items-center justify-between" key={item}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-8 h-8 rounded-full bg-no-repeat  bg-center bg-cover"
+                        style={{
+                          backgroundImage: `url(${coinInfo[item]?.iconUrl})`,
+                        }}
+                      ></div>
+
+                      <span className="text-white text-2xl font-aeonik">{chosedCoin[item]}</span>
+                      <span className="text-lg text-gray-400">{item}</span>
+                    </div>
+                    <span className="text-gray-400 text-2xl font-aeonik">
+                     {item} Token
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 底部按钮 */}
+        <div className="w-full flex justify-center items-center  bottom-4">
+          <button
+            className="flex-1 h-10 rounded-full border  bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors mr-4"
+            onClick={showDrawer}
+          >
+            CHOOSE COINS
+          </button>
+          <button className="flex-1 h-10 rounded-full  border-gray-200 bg-gray-100 hover:bg-gray-200  text-sm font-medium transition-colors">
+            CHOOSE NFTS
+          </button>
         </div>
       </div>
+
+      {/* 输入口令并发送 */}
+      <div className="w-3/4 max-w-[800px] px-10  h-96  mx-auto mt-3  border-8 rounded-3xl border-black flex flex-col justify-around items-center">
+      123</div>
       <Drawer
         style={{ borderRadius: "10px 0 0 10px" }}
         styles={{ header: { display: "none" } }}
-        width='500px'
+        width="500px"
         onClose={onClose}
         open={open}
       >
-        <DrawBody />
+        <DrawBody getChosedCoin={getChosedCoin} getCoinInfo={getCoinInfo} />
       </Drawer>
     </div>
   );
