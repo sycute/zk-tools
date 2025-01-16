@@ -10,15 +10,11 @@ const onFinishFailed = (errorInfo) => {
 const App = () => (
   <div className='bg-white' >
  <Form
-    
-   
-  
     onFinish={onFinish}
     onFinishFailed={onFinishFailed}
     autoComplete="off"
   >
     <Form.Item
-    
       name="username"
       rules={[
         {

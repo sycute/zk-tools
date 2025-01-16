@@ -1,15 +1,19 @@
 "use client";
 import Navbar from "@/components/Navbar.js";
-import { Button, Drawer } from "antd";
+import { useSuiClient,useCurrentAccount } from "@mysten/dapp-kit";
+import { Drawer, Form, Input, Row, Col } from "antd";
 import { useState } from "react";
 // 修改元数据
-
 import DrawBody from "@/components/drawBody.js";
+import { getCoins, combineCoins } from "@/api/suiData.js";
 
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
+
   const [coinInfo, setCoinInfo] = useState({});
   const [chosedCoin, setChosedCoin] = useState({});
+  const client = useSuiClient();
+  const currentAccount = useCurrentAccount();
   const showDrawer = () => {
     setOpen(true);
   };
@@ -27,12 +31,33 @@ export default function Home() {
     setCoinInfo(val);
   };
 
+
+  const send = () => {
+    // 合并所有coin
+    console.log(coinInfo);
+    console.log(chosedCoin);
+   
+    
+    
+    // Object.keys(chosedCoin).forEach(async(type) => {
+      
+    //   let coins=await getCoins(client,currentAccount,coinInfo[type].f)
+    //   console.log(coins);
+      
+      
+    // });
+
+    // 发送红包数据
+  };
+
   return (
     <div className="h-screen bg-white m-2 rounded-2xl relative">
       <Navbar />
       {/* 选择Coin */}
       <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto mt-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center">
-        <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">Create a Stash</div>
+        <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">
+          Create a Stash
+        </div>
         {Object.keys(chosedCoin).length == 0 && (
           <div>Choose one or more assets to send in the stash.</div>
         )}
@@ -52,17 +77,38 @@ export default function Home() {
                         }}
                       ></div>
 
-                      <span className="text-white text-2xl font-aeonik">{chosedCoin[item]}</span>
+                      <span className="text-white text-2xl font-aeonik">
+                        {chosedCoin[item]}
+                      </span>
                       <span className="text-lg text-gray-400">{item}</span>
                     </div>
                     <span className="text-gray-400 text-2xl font-aeonik">
-                     {item} Token
+                      {item} Token
                     </span>
                   </div>
                 );
               })}
             </div>
           </div>
+        )}
+
+        {/* 输入口令 */}
+        {Object.keys(chosedCoin).length > 0 && (
+          <Form>
+            <Row>
+              <Col span={10} className="mr-8">
+                <Form.Item label="数量">
+                  <Input className=" border-gray-500" />
+                </Form.Item>
+              </Col>
+
+              <Col span={12}>
+                <Form.Item label={<div style={{}}>口令</div>}>
+                  <Input className=" border-gray-500" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
         )}
 
         {/* 底部按钮 */}
@@ -73,15 +119,16 @@ export default function Home() {
           >
             CHOOSE COINS
           </button>
-          <button className="flex-1 h-10 rounded-full  border-gray-200 bg-gray-100 hover:bg-gray-200  text-sm font-medium transition-colors">
-            CHOOSE NFTS
+          <button
+            className="flex-1 h-10 rounded-full  border-gray-200 bg-gray-100 hover:bg-gray-200  text-sm font-medium transition-colors disabled:bg-gray-50 disabled:text-gray-300 disabled:cursor-not-allowed"
+            disabled={Object.keys(chosedCoin).length == 0}
+            onClick={send}
+          >
+            SEND
           </button>
         </div>
       </div>
 
-      {/* 输入口令并发送 */}
-      <div className="w-3/4 max-w-[800px] px-10  h-96  mx-auto mt-3  border-8 rounded-3xl border-black flex flex-col justify-around items-center">
-      123</div>
       <Drawer
         style={{ borderRadius: "10px 0 0 10px" }}
         styles={{ header: { display: "none" } }}
@@ -89,7 +136,7 @@ export default function Home() {
         onClose={onClose}
         open={open}
       >
-        <DrawBody getChosedCoin={getChosedCoin} getCoinInfo={getCoinInfo} />
+        <DrawBody getChosedCoin={getChosedCoin} getCoinInfo={getCoinInfo}  />
       </Drawer>
     </div>
   );

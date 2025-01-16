@@ -55,7 +55,7 @@ const DrawBody = (props) => {
 
         setCoinInfo((prevDecimals) => {
           let data = { ...prevDecimals };
-          data[item.type] = { ...res };
+          data[item.type] = { ...res,fullType:item.fullType };
           return data;
         });
       });
@@ -68,6 +68,8 @@ const DrawBody = (props) => {
   useEffect(() => {
     props.getCoinInfo(coinInfo);
   }, [coinInfo]);
+
+
 
   // 切换到编辑模式
   const handleEdit = (index) => {
@@ -87,12 +89,14 @@ const DrawBody = (props) => {
 
   const submit = () => {
     console.log("确认");
+    // 合并所有coin
+
+    // 发送红包数据
   };
 
   const handleChange = (type, value) => {
     // 保存数据
     const chosed = { ...chosedCoin, [type]: value };
-
     // 将值传给父组件
     props.getChosedCoin(chosed);
     // 更新本地数值
