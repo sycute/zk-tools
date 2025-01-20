@@ -1,10 +1,5 @@
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-
-const txb = new TransactionBlock();
-// const txb2 = useSignTransactionBlock(); //也可以这样写
-
 // 获取一种类型的所有硬币列表
-export const getCoins = async (client,currentAccount,coinType) => {
+export const getCoins = async (client, currentAccount, coinType) => {
   const { data } = await client.getCoins({
     owner: currentAccount?.address,
     coinType: coinType,
@@ -13,7 +8,7 @@ export const getCoins = async (client,currentAccount,coinType) => {
   return data;
 };
 
-export const combineCoins = async (coins,coinType) => {
+export const combineCoins = async (txb,coins, coinType) => {
   if (coins.length < 2) return;
   let idList = coins.map((i) => {
     return i.coinObjectId;
@@ -26,4 +21,28 @@ export const combineCoins = async (coins,coinType) => {
       typeArguments: [coinType],
     });
   }
+};
+
+export const splitCoins = async (txb,coin, coinType, amount, decimals) => {
+  console.log(coin, coinType, amount, decimals);
+
+  const given_coin = txb.moveCall({
+    target: "0x2::coin::split",
+    arguments: [
+      txb.object(coin.coinObjectId),
+      txb.pure(amount * 10 ** decimals),
+    ],
+    typeArguments: [coinType],
+  });
+
+  return given_coin;
+};
+
+export const intoBalance = (txb,given_coin, coinType) => {
+  const given_balance = txb.moveCall({
+    target: "0x2::coin::into_balance",
+    arguments: [txb.object(given_coin)],
+    typeArguments: [coinType],
+  });
+  return given_balance;
 };

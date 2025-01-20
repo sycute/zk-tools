@@ -13,7 +13,7 @@ export default function Provider({ children }) {
           <QueryClientProvider client={queryClient}>
             <SuiClientProvider
               networks={networkConfig}
-              defaultNetwork="mainnet"
+              defaultNetwork="testnet"
             >
               <WalletProvider autoConnect>
                 {children}

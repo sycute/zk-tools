@@ -1,19 +1,34 @@
 "use client";
 import Navbar from "@/components/Navbar.js";
-import { useSuiClient,useCurrentAccount } from "@mysten/dapp-kit";
+import {
+  useSuiClient,
+  useCurrentAccount,
+  useSignAndExecuteTransaction,
+} from "@mysten/dapp-kit";
 import { Drawer, Form, Input, Row, Col } from "antd";
 import { useState } from "react";
+import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { Transaction } from '@mysten/sui/transactions';
+import axios from "axios";
+
 // 修改元数据
 import DrawBody from "@/components/drawBody.js";
-import { getCoins, combineCoins } from "@/api/suiData.js";
-
+import {
+  getCoins,
+  combineCoins,
+  splitCoins,
+  intoBalance,
+} from "@/api/suiData.js";
+import { TESTNET_ZKREDPACK_PACKAGE_ID } from "@/components/networkConfig.js";
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
 
   const [coinInfo, setCoinInfo] = useState({});
+  // 这个数据原来是一个数组，后来改成最多只有一个。下面的循环没有改所以看起来冗余
   const [chosedCoin, setChosedCoin] = useState({});
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
+  const { mutate: signAndExecute } = useSignAndExecuteTransaction();
   const showDrawer = () => {
     setOpen(true);
   };
@@ -31,23 +46,82 @@ export default function Home() {
     setCoinInfo(val);
   };
 
-
-  const send = () => {
+  const send = async () => {
+    let txb = new TransactionBlock();
     // 合并所有coin
     console.log(coinInfo);
     console.log(chosedCoin);
-   
-    
-    
-    // Object.keys(chosedCoin).forEach(async(type) => {
-      
-    //   let coins=await getCoins(client,currentAccount,coinInfo[type].f)
-    //   console.log(coins);
-      
-      
-    // });
+    // 获取口令加密字符串
+    const { data: encryptedPassword } = await axios.get(
+      `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${"sam"}`
+    );
+    console.log(encryptedPassword);
 
-    // 发送红包数据
+    Object.keys(chosedCoin).forEach(async (type) => {
+      let fullType = coinInfo[type].fullType;
+      let amount = chosedCoin[type];
+      let coins = await getCoins(client, currentAccount, fullType);
+      console.log(coins);
+
+      // 合并代币，合并之后代币都在coins[0]中
+      await combineCoins(txb, coins, fullType);
+      // 分割代币
+      let given_balance = await splitCoins(
+        txb,
+        coins[0],
+        fullType,
+        amount,
+        coinInfo[type].decimals
+      );
+      console.log(given_balance);
+      given_balance = intoBalance(txb, given_balance, fullType);
+      console.log(given_balance);
+      // 发送红包数据
+      txb.moveCall({
+        target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
+        arguments: [
+          txb.object(
+            "0x80011863aba3e88fb5f975ef124bd3bf3340398625a9372b52d583d012bcac17"
+          ),
+          txb.object(given_balance),
+          txb.pure.u64(amount),
+          txb.object(encryptedPassword),
+        ],
+        typeArguments: [fullType],
+      });
+      
+      signAndExecute(
+        {
+          transaction: txb,
+          options: {
+            showEffects: true,
+            showObjectChanges: true,
+          },
+        },
+        {
+          onSuccess: (tx) => {
+            console.log('success');
+            
+          },
+          onError: (error) => {
+            console.log(error);
+            
+          },
+        }
+      );
+      // signAndExecute(
+      //   {
+      //     transaction: new Transaction(),
+      //     chain: 'sui:devnet',
+      //   },
+      //   {
+      //     onSuccess: (result) => {
+      //       console.log('executed transaction', result);
+      //       setDigest(result.digest);
+      //     },
+      //   },
+      // );
+    });
   };
 
   return (
@@ -136,7 +210,7 @@ export default function Home() {
         onClose={onClose}
         open={open}
       >
-        <DrawBody getChosedCoin={getChosedCoin} getCoinInfo={getCoinInfo}  />
+        <DrawBody getChosedCoin={getChosedCoin} getCoinInfo={getCoinInfo} />
       </Drawer>
     </div>
   );

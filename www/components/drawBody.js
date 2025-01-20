@@ -55,7 +55,7 @@ const DrawBody = (props) => {
 
         setCoinInfo((prevDecimals) => {
           let data = { ...prevDecimals };
-          data[item.type] = { ...res,fullType:item.fullType };
+          data[item.type] = { ...res, fullType: item.fullType };
           return data;
         });
       });
@@ -69,17 +69,17 @@ const DrawBody = (props) => {
     props.getCoinInfo(coinInfo);
   }, [coinInfo]);
 
-
-
   // 切换到编辑模式
   const handleEdit = (index) => {
+    // 将正在编辑的选项改为true，其余改为false
     setEditStates((prev) =>
-      prev.map((editState, i) => (i === index ? true : editState))
+      prev.map((editState, i) => (i === index ? true : false))
     );
   };
   // 手动触发验证
   const handleBlur = () => {
-    form.validateFields();
+    
+    // form.validateFields();
   };
 
   // 取消
@@ -89,14 +89,11 @@ const DrawBody = (props) => {
 
   const submit = () => {
     console.log("确认");
-    // 合并所有coin
-
-    // 发送红包数据
   };
 
   const handleChange = (type, value) => {
     // 保存数据
-    const chosed = { ...chosedCoin, [type]: value };
+    const chosed = { [type]: value };
     // 将值传给父组件
     props.getChosedCoin(chosed);
     // 更新本地数值
