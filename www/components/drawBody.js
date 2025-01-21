@@ -67,6 +67,7 @@ const DrawBody = (props) => {
   // 当coinInfo改变时传递到父组件
   useEffect(() => {
     props.getCoinInfo(coinInfo);
+
   }, [coinInfo]);
 
   // 切换到编辑模式
@@ -88,14 +89,14 @@ const DrawBody = (props) => {
   };
 
   const submit = () => {
-    console.log("确认");
+     // 将值传给父组件
+     props.getChosedCoin(chosedCoin);
+     props.setOpen(false);
   };
 
   const handleChange = (type, value) => {
     // 保存数据
     const chosed = { [type]: value };
-    // 将值传给父组件
-    props.getChosedCoin(chosed);
     // 更新本地数值
     setChosedCoin(chosed);
   };
@@ -176,6 +177,7 @@ const DrawBody = (props) => {
                             handleChange(item.type, e);
                           }}
                           onBlur={handleBlur}
+                          autoFocus
                         />
                       </Form.Item>
                     ) : (

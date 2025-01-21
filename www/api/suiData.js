@@ -11,10 +11,12 @@ export const getCoins = async (client, currentAccount, coinType) => {
 export const combineCoins = async (txb,coins, coinType) => {
   if (coins.length < 2) return;
   let idList = coins.map((i) => {
+    console.log(i.coinObjectId);
+    
     return i.coinObjectId;
   });
 
-  for (let i = 1; i < idList.length - 1; i++) {
+  for (let i = 1; i < idList.length-2; i++) {
     txb.moveCall({
       target: "0x2::coin::join",
       arguments: [txb.object(idList[0]), txb.object(idList[i])],

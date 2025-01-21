@@ -13,10 +13,6 @@ const { networkConfig, useNetworkVariable, useNetworkVariables } =
     },
     testnet: {
       url: getFullnodeUrl("testnet"),
-      variables: {
-        zkRedpackPackageId: TESTNET_ZKREDPACK_PACKAGE_ID,
-        testnetRedpackStoreObjectId: TESTNET_REDPACKSTORE_OBJECT_ID,
-      },
     },
     mainnet: {
       url: getFullnodeUrl("mainnet"),

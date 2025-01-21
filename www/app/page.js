@@ -5,10 +5,11 @@ import {
   useCurrentAccount,
   useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
-import { Drawer, Form, Input, Row, Col } from "antd";
+import { Drawer, Form, Input, Row, Col, InputNumber } from "antd";
 import { useState } from "react";
-import { TransactionBlock } from "@mysten/sui.js/transactions";
-import { Transaction } from '@mysten/sui/transactions';
+// import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { Transaction } from "@mysten/sui/transactions";
+import { useTransactionExecution } from "@/api/useTransactionExecution.js";
 import axios from "axios";
 
 // 修改元数据
@@ -22,13 +23,15 @@ import {
 import { TESTNET_ZKREDPACK_PACKAGE_ID } from "@/components/networkConfig.js";
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
-
+  const [amount, setAmount] = useState(0); // 红包数量
+  const [passWord, setPassWord] = useState(""); //口令
   const [coinInfo, setCoinInfo] = useState({});
   // 这个数据原来是一个数组，后来改成最多只有一个。下面的循环没有改所以看起来冗余
   const [chosedCoin, setChosedCoin] = useState({});
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
   const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+  const executeTx = useTransactionExecution();
   const showDrawer = () => {
     setOpen(true);
   };
@@ -47,35 +50,32 @@ export default function Home() {
   };
 
   const send = async () => {
-    let txb = new TransactionBlock();
-    // 合并所有coin
-    console.log(coinInfo);
-    console.log(chosedCoin);
+    let txb = new Transaction();
     // 获取口令加密字符串
     const { data: encryptedPassword } = await axios.get(
-      `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${"sam"}`
+      `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${passWord}`
     );
     console.log(encryptedPassword);
 
     Object.keys(chosedCoin).forEach(async (type) => {
       let fullType = coinInfo[type].fullType;
-      let amount = chosedCoin[type];
       let coins = await getCoins(client, currentAccount, fullType);
-      console.log(coins);
 
-      // 合并代币，合并之后代币都在coins[0]中
-      await combineCoins(txb, coins, fullType);
-      // 分割代币
-      let given_balance = await splitCoins(
-        txb,
-        coins[0],
-        fullType,
-        amount,
-        coinInfo[type].decimals
-      );
-      console.log(given_balance);
-      given_balance = intoBalance(txb, given_balance, fullType);
-      console.log(given_balance);
+      let given_balance;
+      if (fullType == "0x2::sui::SUI") {
+        given_balance = txb.splitCoins(txb.gas, [0.05 * 10 ** 9]);
+      } else {
+        await combineCoins(txb, coins, fullType);
+        // 分割代币
+        given_balance = await splitCoins(
+          txb,
+          coins[0],
+          fullType,
+          amount,
+          coinInfo[type].decimals
+        );
+      }
+
       // 发送红包数据
       txb.moveCall({
         target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
@@ -89,38 +89,8 @@ export default function Home() {
         ],
         typeArguments: [fullType],
       });
-      
-      signAndExecute(
-        {
-          transaction: txb,
-          options: {
-            showEffects: true,
-            showObjectChanges: true,
-          },
-        },
-        {
-          onSuccess: (tx) => {
-            console.log('success');
-            
-          },
-          onError: (error) => {
-            console.log(error);
-            
-          },
-        }
-      );
-      // signAndExecute(
-      //   {
-      //     transaction: new Transaction(),
-      //     chain: 'sui:devnet',
-      //   },
-      //   {
-      //     onSuccess: (result) => {
-      //       console.log('executed transaction', result);
-      //       setDigest(result.digest);
-      //     },
-      //   },
-      // );
+      let res = executeTx(txb);
+      console.log(res);
     });
   };
 
@@ -171,14 +141,24 @@ export default function Home() {
           <Form>
             <Row>
               <Col span={10} className="mr-8">
-                <Form.Item label="数量">
-                  <Input className=" border-gray-500" />
+                <Form.Item label="红包数量">
+                  <InputNumber
+                    className=" border-gray-500"
+                    onChange={(e) => {
+                      setAmount(e);
+                    }}
+                  />
                 </Form.Item>
               </Col>
 
               <Col span={12}>
                 <Form.Item label={<div style={{}}>口令</div>}>
-                  <Input className=" border-gray-500" />
+                  <Input
+                    className=" border-gray-500"
+                    onChange={(e) => {
+                      setPassWord(e.target.value);
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>
@@ -210,7 +190,11 @@ export default function Home() {
         onClose={onClose}
         open={open}
       >
-        <DrawBody getChosedCoin={getChosedCoin} getCoinInfo={getCoinInfo} />
+        <DrawBody
+          getChosedCoin={getChosedCoin}
+          getCoinInfo={getCoinInfo}
+          setOpen={setOpen}
+        />
       </Drawer>
     </div>
   );
