@@ -1,9 +1,6 @@
 "use client";
 import Navbar from "@/components/Navbar.js";
-import {
-  useSuiClient,
-  useCurrentAccount,
-} from "@mysten/dapp-kit";
+import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
 import { Drawer, Form, Input, Row, Col, InputNumber } from "antd";
 import { useState } from "react";
 // import { TransactionBlock } from "@mysten/sui.js/transactions";
@@ -13,11 +10,7 @@ import axios from "axios";
 
 // 修改元数据
 import DrawBody from "@/components/drawBody.js";
-import {
-  getCoins,
-  combineCoins,
-  splitCoins,
-} from "@/api/suiData.js";
+import { getCoins, combineCoins, splitCoins } from "@/api/suiData.js";
 import { TESTNET_ZKREDPACK_PACKAGE_ID } from "@/components/networkConfig.js";
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
@@ -26,9 +19,10 @@ export default function Home() {
   const [coinInfo, setCoinInfo] = useState({});
   // 这个数据原来是一个数组，后来改成最多只有一个。下面的循环没有改所以看起来冗余
   const [chosedCoin, setChosedCoin] = useState({});
+  const [form] = Form.useForm();
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
-  
+
   const executeTx = useTransactionExecution();
   const showDrawer = () => {
     setOpen(true);
@@ -47,53 +41,63 @@ export default function Home() {
     setCoinInfo(val);
   };
 
-  const send = async () => {
-    let txb = new Transaction();
-    // 获取口令加密字符串
-    const { data: encryptedPassword } = await axios.get(
-      `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${passWord}`
-    );
-    console.log(encryptedPassword);
-
-    Object.keys(chosedCoin).forEach(async (type) => {
-      let fullType = coinInfo[type].fullType;
-      let coins = await getCoins(client, currentAccount, fullType);
-
-      let given_balance;
-      if (fullType == "0x2::sui::SUI") {
-        given_balance = txb.splitCoins(txb.gas, [0.05 * 10 ** 9]);
-      } else {
-        await combineCoins(txb, coins, fullType);
-        // 分割代币
-        given_balance = await splitCoins(
-          txb,
-          coins[0],
-          fullType,
-          amount,
-          coinInfo[type].decimals
+  const send =  () => {
+    form
+      .validateFields()
+      .then(async () => {
+        let txb = new Transaction();
+        // 获取口令加密字符串
+        const { data: encryptedPassword } = await axios.get(
+          `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${passWord}`
         );
-      }
+        console.log(encryptedPassword);
 
-      // 发送红包数据
-      txb.moveCall({
-        target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
-        arguments: [
-          txb.object(
-            "0x80011863aba3e88fb5f975ef124bd3bf3340398625a9372b52d583d012bcac17"
-          ),
-          txb.object(given_balance),
-          txb.pure.u64(amount),
-          txb.object(encryptedPassword),
-        ],
-        typeArguments: [fullType],
+        Object.keys(chosedCoin).forEach(async (type) => {
+          let fullType = coinInfo[type].fullType;
+          let coins = await getCoins(client, currentAccount, fullType);
+
+          let given_balance;
+          if (fullType == "0x2::sui::SUI") {
+            given_balance = txb.splitCoins(txb.gas, [0.05 * 10 ** 9]);
+          } else {
+            await combineCoins(txb, coins, fullType);
+            // 分割代币
+            given_balance = await splitCoins(
+              txb,
+              coins[0],
+              fullType,
+              amount,
+              coinInfo[type].decimals
+            );
+          }
+
+          // 发送红包数据
+          txb.moveCall({
+            target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
+            arguments: [
+              txb.object(
+                "0x80011863aba3e88fb5f975ef124bd3bf3340398625a9372b52d583d012bcac17"
+              ),
+              txb.object(given_balance),
+              txb.pure.u64(amount),
+              txb.object(encryptedPassword),
+            ],
+            typeArguments: [fullType],
+          });
+          let res = executeTx(txb);
+          console.log(res);
+        });
+      })
+      .catch(() => {
+        console.log(false);
       });
-      let res = executeTx(txb);
-      console.log(res);
-    });
   };
 
   return (
-    <div className="h-screen bg-white m-2 rounded-2xl relative" style={{backgroundImage:'url("/image/bg.jpg")'}}>
+    <div
+      className="h-screen bg-white m-2 rounded-2xl relative"
+      style={{ backgroundImage: 'url("/image/bg.jpg")' }}
+    >
       <Navbar />
       {/* 选择Coin */}
       <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto mt-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center bg-white">
@@ -136,12 +140,24 @@ export default function Home() {
 
         {/* 输入口令 */}
         {Object.keys(chosedCoin).length > 0 && (
-          <Form>
+          <Form form={form}>
             <Row>
               <Col span={10} className="mr-8">
-                <Form.Item label="红包数量">
+                <Form.Item
+                name="amount"
+                  label="红包数量"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input Amount!",
+                    },
+                  ]}
+                >
                   <InputNumber
                     className=" border-gray-500"
+                    min={0}
+                    max={9999}
+                    parser={(text) => (/^\d+$/.test(text) ? text : 1)}
                     onChange={(e) => {
                       setAmount(e);
                     }}
@@ -150,7 +166,16 @@ export default function Home() {
               </Col>
 
               <Col span={12}>
-                <Form.Item label={<div style={{}}>口令</div>}>
+                <Form.Item
+                  name="password"
+                  label={<div style={{}}>口令</div>}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please input password!",
+                    },
+                  ]}
+                >
                   <Input
                     className=" border-gray-500"
                     onChange={(e) => {
