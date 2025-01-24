@@ -1,0 +1,52 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+.idea
+.DS_STORE
+.vscode
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# JavaScript/React
+*.js.map
+*.jsx.map
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+build/
+dist/
+coverage/
+
+# Shuttle
+.shuttle*
+Secrets*.toml
+
+# next.js
+/.next/
+/out/
