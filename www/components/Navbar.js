@@ -21,7 +21,7 @@ const nav = [
 const Navbar = () => {
   return (
       <header className=" flex justify-between items-center mx-auto px-4  max-w-[1440px]  ">
-        <h1 className="text-2xl">Next.js</h1>
+        <h1 className="text-2xl block bg-white  p-2 rounded-lg">Next.js</h1>
         <nav>
           <ul className="flex gap-4">
             {nav.map((item) => (

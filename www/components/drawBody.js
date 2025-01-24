@@ -49,7 +49,7 @@ const DrawBody = (props) => {
 
     const getAllCoinInfo = () => {
       if (!currentAccount?.address) return;
-      if (!coinTypes.length) return;
+      if (coinTypes.length==0) return;
       coinTypes.forEach(async (item) => {
         const res = await getCoinInfo(item.fullType);
 
@@ -85,6 +85,7 @@ const DrawBody = (props) => {
 
   // 取消
   const cancel = () => {
+    props.setOpen(false);
     console.log("取消");
   };
 

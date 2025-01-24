@@ -40,11 +40,3 @@ export const splitCoins = async (txb,coin, coinType, amount, decimals) => {
   return given_coin;
 };
 
-export const intoBalance = (txb,given_coin, coinType) => {
-  const given_balance = txb.moveCall({
-    target: "0x2::coin::into_balance",
-    arguments: [txb.object(given_coin)],
-    typeArguments: [coinType],
-  });
-  return given_balance;
-};

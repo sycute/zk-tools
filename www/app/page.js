@@ -3,7 +3,6 @@ import Navbar from "@/components/Navbar.js";
 import {
   useSuiClient,
   useCurrentAccount,
-  useSignAndExecuteTransaction,
 } from "@mysten/dapp-kit";
 import { Drawer, Form, Input, Row, Col, InputNumber } from "antd";
 import { useState } from "react";
@@ -18,7 +17,6 @@ import {
   getCoins,
   combineCoins,
   splitCoins,
-  intoBalance,
 } from "@/api/suiData.js";
 import { TESTNET_ZKREDPACK_PACKAGE_ID } from "@/components/networkConfig.js";
 export default function Home() {
@@ -30,7 +28,7 @@ export default function Home() {
   const [chosedCoin, setChosedCoin] = useState({});
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
-  const { mutate: signAndExecute } = useSignAndExecuteTransaction();
+  
   const executeTx = useTransactionExecution();
   const showDrawer = () => {
     setOpen(true);
@@ -95,10 +93,10 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen bg-white m-2 rounded-2xl relative">
+    <div className="h-screen bg-white m-2 rounded-2xl relative" style={{backgroundImage:'url("/image/bg.jpg")'}}>
       <Navbar />
       {/* 选择Coin */}
-      <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto mt-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center">
+      <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto mt-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center bg-white">
         <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">
           Create a Stash
         </div>
