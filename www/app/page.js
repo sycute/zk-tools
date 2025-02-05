@@ -77,9 +77,7 @@ export default function Home() {
           txb.moveCall({
             target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
             arguments: [
-              txb.object(
-                TESTNET_REDPACKSTORE_OBJECT_ID
-              ),
+              txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
               txb.object(given_balance),
               txb.pure.u64(amount),
               txb.object(encryptedPassword),
@@ -96,10 +94,7 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="min-h-screen   relative pb-56 pt-24"
-      style={{ backgroundImage: 'url("/image/bg.jpg")' }}
-    >
+    <div className="min-h-screen   relative pb-56 pt-24">
       {/* 选择Coin */}
       <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto    flex flex-col justify-around items-center rounded-2xl shadow-lg bg-slate-50">
         <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">
@@ -221,7 +216,7 @@ export default function Home() {
         />
       </Drawer>
 
-        <RpList />
+      <RpList />
     </div>
   );
 }

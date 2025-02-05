@@ -1,4 +1,3 @@
-
 import "./globals.css";
 import React from "react";
 import "@mysten/dapp-kit/dist/index.css";
@@ -13,10 +12,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-slate-100 ">
-  
-        <Provider> 
-        <Navbar />
-          {children}</Provider>
+        <Provider>
+          <Navbar />
+          {children}
+        </Provider>
       </body>
     </html>
   );
