@@ -3,6 +3,9 @@ import { useEffect, use, useState } from "react";
 import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
 import { truncateString } from "@/utils/util.js";
 import { Drawer, Form, Input, Row, Col, InputNumber, Button } from "antd";
+import { useTransactionExecution } from "@/api/useTransactionExecution.js";
+import { Transaction } from "@mysten/sui/transactions";
+import { TESTNET_ZKREDPACK_PACKAGE_ID,TESTNET_REDPACKSTORE_OBJECT_ID } from "@/components/networkConfig.js";
 
 export default function UserPage({ params }) {
   const [rpInfo, setRpInfo] = useState();
@@ -11,6 +14,7 @@ export default function UserPage({ params }) {
   // 从 params 中获取动态路由参数
   const { id } = use(params);
   const client = useSuiClient();
+  const executeTx = useTransactionExecution();
   // 根据id获取红包数据
   useEffect(() => {
     const getRpInfo = async () => {
@@ -24,6 +28,41 @@ export default function UserPage({ params }) {
     getRpInfo();
   }, []);
 
+  const handleClaim = () => {
+    // 校验表单
+    form
+      .validateFields()
+      .then(() => {
+        console.log("领取中...");
+        
+        // 获取密码
+        
+        // 执行领取逻辑
+        let txb = new Transaction();
+
+
+        // 领取
+        txb.moveCall({
+          target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::claim`,
+          arguments: [
+            txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
+            txb.object(encryptedPassword),
+            txb.object(given_balance),
+            txb.pure.u64(amount),
+          ],
+          typeArguments: [fullType],
+        });
+
+        // 执行
+        let res = executeTx(txb);
+        console.log(res);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    console.log("领取");
+  };
   return (
     <div>
       {/* 信息展示 */}
@@ -40,17 +79,23 @@ export default function UserPage({ params }) {
               <div className="text-sm text-gray-500">Total Balance</div>
             </div>
             <div className="space-y-1">
-              <div className="text-3xl font-semibold">{rpInfo?.nums-rpInfo?.claimers.length}/{rpInfo?.nums}</div>
+              <div className="text-3xl font-semibold">
+                {rpInfo?.nums - rpInfo?.claimers.length}/{rpInfo?.nums}
+              </div>
               <div className="text-sm text-gray-500">Packet Remain</div>
             </div>
 
             {/* 次要数据 */}
             <div className="space-y-1">
-              <div className="text-base text-gray-600">{truncateString(rpInfo?.id.id)}</div>
+              <div className="text-base text-gray-600">
+                {truncateString(rpInfo?.id.id)}
+              </div>
               <div className="text-sm text-gray-500">Packet Id</div>
             </div>
             <div className="space-y-1">
-              <div className="text-base text-gray-600">{truncateString(rpInfo?.sender)}</div>
+              <div className="text-base text-gray-600">
+                {truncateString(rpInfo?.sender)}
+              </div>
               <div className="text-sm text-gray-500">Sender</div>
             </div>
           </div>
@@ -71,6 +116,9 @@ export default function UserPage({ params }) {
                 <Input
                   className="border-gray-500 border-none shadow-lg"
                   placeholder="输入口令"
+                  onChange={(e)=>{
+                    setPassWord(e.target.value);
+                  }}
                 />
               </Form.Item>
             </Col>
@@ -78,6 +126,7 @@ export default function UserPage({ params }) {
               <Button
                 htmlType="submit"
                 className="ml-2 border-none shadow-lg bg-slate-200"
+                onClick={handleClaim}
               >
                 领取
               </Button>

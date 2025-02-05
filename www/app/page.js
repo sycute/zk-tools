@@ -187,13 +187,13 @@ export default function Home() {
         {/* 底部按钮 */}
         <div className="w-full flex justify-center items-center  bottom-4">
           <button
-            className="flex-1 h-10 rounded-full border  bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors mr-4"
+            className="flex-1 h-10 rounded-full border  bg-slate-200  hover:bg-slate-300 text-slate-500 hover:text-slate-600 text-sm font-semibold transition-colors mr-4"
             onClick={showDrawer}
           >
             CHOOSE COINS
           </button>
           <button
-            className="flex-1 h-10 rounded-full  border-gray-200 bg-gray-100 hover:bg-gray-200  text-sm font-medium transition-colors disabled:bg-gray-50 disabled:text-gray-300 disabled:cursor-not-allowed"
+            className="flex-1 h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-500 hover:text-slate-600  text-sm font-semibold transition-colors disabled:bg-slate-100  disabled:text-gray-300 disabled:cursor-not-allowed"
             disabled={Object.keys(chosedCoin).length == 0}
             onClick={send}
           >

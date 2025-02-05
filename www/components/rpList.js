@@ -2,6 +2,7 @@ import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
 import { useEffect, useState } from "react";
 import { TESTNET_REDPACKSTORE_OBJECT_ID } from "@/components/networkConfig.js";
 import Link from "next/link";
+import { truncateString } from "@/utils/util.js";
 
 const RpList = () => {
   const [rpIdList, setRpIdList] = useState([]); //id列表
@@ -47,9 +48,39 @@ const RpList = () => {
   return (
     <div className="mt-12 flex w-3/4 max-w-[800px] mx-auto flex-wrap justify-start ">
       {rpList.map((item) => {
+        let fields = item.content.fields;
         return (
           <Link href={`/receive/${item.objectId}`} key={item.objectId}>
-            <div className="w-36 h-44  m-2 rounded-2xl shadow-lg bg-slate-50"></div>
+            <div className="w-44 h-52 m-3 p-2 rounded-2xl shadow-lg bg-slate-50">
+              <div className="text-center ">
+                <div className="text-3xl font-bold mb-2">
+                {fields?.nums-fields?.claimers.length}/{fields?.nums}
+                </div>
+              </div>
+              {/* 其他信息 */}
+              <div>
+                <div className="text-center mb-1">
+                  <div className="text-xs text-gray-500">
+                    Total Balance
+                  </div>
+                  <div className="text-lg font-semibold">{fields.balance}</div>
+                </div>
+
+                <div className="text-center mb-1">
+                  <div className="text-sm text-gray-500 ">Packet Id</div>
+                  <div className="text-base font-medium text-gray-800 font-mono">
+                    {truncateString(item.objectId)}
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <div className="text-sm text-gray-500">Sender</div>
+                  <div className="text-base font-medium text-gray-800 font-mono">
+                   {truncateString(fields.sender)}
+                  </div>
+                </div>
+              </div>
+            </div>
           </Link>
         );
       })}

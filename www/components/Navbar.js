@@ -6,6 +6,7 @@ import {
   useCurrentAccount,
 } from "@mysten/dapp-kit";
 import { useState } from "react";
+import { truncateString } from "@/utils/util.js";
 const nav = [
   // {
   //   title: "SEND",
@@ -28,7 +29,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   return (
     <div>
-      <div className="w-full  px-4 bg-slate-200 shadow-sm fixed  left-1/2 transform -translate-x-1/2   z-10">
+      <div className="w-full  px-4 bg-slate-200 shadow-sm fixed  left-1/2 transform -translate-x-1/2 z-10 border border-b-slate-300">
         <div className="max-w-7xl h-14 mx-auto flex items-center justify-between">
           {/* Logo */}
           <Link href="/">
@@ -54,7 +55,7 @@ const Navbar = () => {
           <ConnectModal
             trigger={
               <button disabled={!!currentAccount}>
-                {currentAccount ? "Connected" : "Connect"}
+                {currentAccount ? truncateString(currentAccount.address) : "Connect"}
               </button>
             }
             open={open}
@@ -62,23 +63,6 @@ const Navbar = () => {
           />
         </div>
       </div>
-      {/* <header className="px-14 flex justify-between items-center mx-auto  w-full max-w-[1440px] fixed top-2 left-1/2 transform -translate-x-1/2   z-10">
-        <Link href="/">
-          <h1 className="text-2xl block bg-white  p-2 rounded-lg shadow-lg">
-            Next.js
-          </h1>
-        </Link>
-        <nav>
-          <ul className="flex gap-4">
-            {nav.map((item) => (
-              <li key={item.title}>
-                <Link href={item.href}>{item.title}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <ConnectButton connectText="连接钱包" />
-      </header> */}
     </div>
   );
 };
