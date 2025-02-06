@@ -40,19 +40,27 @@ const Navbar = () => {
 
   const content = (
     <div className="w-24 ">
-      {accounts.map((act) => {
-        return (
+      {accounts.map((account) =>  (
           <p
             className="border-b-[1px] border-b-slate-100 text-center"
-            key={act.address}
+            key={account.address}
             onClick={() => {
-              switchAccount(act.address);
+              switchAccount(
+                { account },
+                {
+                  onSuccess: () =>
+                    console.log(`switched to ${account.address}`),
+                }
+              );
             }}
           >
-            {truncateString(act.address)}
+            {truncateString(account.address)}
           </p>
-        );
-      })}
+        )
+      )}
+   
+       
+    
       <p
         className="text-center text-base font"
         onClick={() => {
@@ -64,19 +72,12 @@ const Navbar = () => {
       >
         disconnect
       </p>
-      <p
-        className="text-center text-base font"
-        onClick={() => {
-          setOpen(true);
-        }}
-      >
-        add account
-      </p>
+    
     </div>
   );
   return (
     <div>
-      <ConnectButton />
+     
       <div className="w-full  px-4 bg-slate-200 shadow-sm fixed  left-1/2 transform -translate-x-1/2 z-10 border border-b-slate-300">
         <div className="max-w-7xl h-14 mx-auto flex items-center justify-between">
           {/* Logo */}
