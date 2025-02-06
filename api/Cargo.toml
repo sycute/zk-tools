@@ -41,5 +41,5 @@ tracing = "0.1.41"
 # serde = { version = "1.0.217", features = ["serde_derive", "derive"] }
 # serde_json = "1.0.135"
 
-sui_sdk = { git = "https://github.com/mystenlabs/sui", package = "sui-sdk" }
-anyhow = "1.0.95"
+# sui_sdk = { git = "https://github.com/mystenlabs/sui", package = "sui-sdk" }
+# anyhow = "1.0.95"
