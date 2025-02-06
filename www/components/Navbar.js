@@ -1,12 +1,16 @@
 "use client";
 import Link from "next/link";
 import {
-  ConnectButton,
   ConnectModal,
   useCurrentAccount,
+  useDisconnectWallet,
+  useAccounts,
+  useSwitchAccount,
+  ConnectButton,
 } from "@mysten/dapp-kit";
 import { useState } from "react";
 import { truncateString } from "@/utils/util.js";
+import { Button, Popover, Space } from "antd";
 const nav = [
   // {
   //   title: "SEND",
@@ -26,9 +30,53 @@ const nav = [
 ];
 const Navbar = () => {
   const currentAccount = useCurrentAccount();
+  console.log(currentAccount?.address);
+
+  const { mutate: disconnect } = useDisconnectWallet();
+  const { mutate: switchAccount } = useSwitchAccount();
+  const accounts = useAccounts();
+
   const [open, setOpen] = useState(false);
+
+  const content = (
+    <div className="w-24 ">
+      {accounts.map((act) => {
+        return (
+          <p
+            className="border-b-[1px] border-b-slate-100 text-center"
+            key={act.address}
+            onClick={() => {
+              switchAccount(act.address);
+            }}
+          >
+            {truncateString(act.address)}
+          </p>
+        );
+      })}
+      <p
+        className="text-center text-base font"
+        onClick={() => {
+          setOpen(false);
+          setTimeout(() => {
+            disconnect();
+          });
+        }}
+      >
+        disconnect
+      </p>
+      <p
+        className="text-center text-base font"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        add account
+      </p>
+    </div>
+  );
   return (
     <div>
+      <ConnectButton />
       <div className="w-full  px-4 bg-slate-200 shadow-sm fixed  left-1/2 transform -translate-x-1/2 z-10 border border-b-slate-300">
         <div className="max-w-7xl h-14 mx-auto flex items-center justify-between">
           {/* Logo */}
@@ -52,15 +100,24 @@ const Navbar = () => {
           {/* Wallet Address */}
 
           {/* <ConnectButton className="bg-black" connectText="连接钱包" /> */}
-          <ConnectModal
-            trigger={
-              <button disabled={!!currentAccount}>
-                {currentAccount ? truncateString(currentAccount.address) : "Connect"}
-              </button>
-            }
-            open={open}
-            onOpenChange={(isOpen) => setOpen(isOpen)}
-          />
+
+          {currentAccount ? (
+            <Popover content={content} title="" trigger="click">
+              {currentAccount
+                ? truncateString(currentAccount.address)
+                : "Connect"}
+            </Popover>
+          ) : (
+            <ConnectModal
+              trigger={
+                <button disabled={!!currentAccount}>
+                  {currentAccount ? "Connected" : "Connect"}
+                </button>
+              }
+              open={open}
+              onOpenChange={(isOpen) => setOpen(isOpen)}
+            />
+          )}
         </div>
       </div>
     </div>

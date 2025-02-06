@@ -80,7 +80,7 @@ export default function Home() {
               txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
               txb.object(given_balance),
               txb.pure.u64(amount),
-              txb.object(encryptedPassword),
+              txb.pure.string(encryptedPassword),
             ],
             typeArguments: [fullType],
           });

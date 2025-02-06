@@ -6,7 +6,7 @@ import { Drawer, Form, Input, Row, Col, InputNumber, Button } from "antd";
 import { useTransactionExecution } from "@/api/useTransactionExecution.js";
 import { Transaction } from "@mysten/sui/transactions";
 import { TESTNET_ZKREDPACK_PACKAGE_ID,TESTNET_REDPACKSTORE_OBJECT_ID } from "@/components/networkConfig.js";
-
+import axios from "axios";
 export default function UserPage({ params }) {
   const [rpInfo, setRpInfo] = useState();
   const [passWord, setPassWord] = useState(""); //口令
@@ -32,11 +32,19 @@ export default function UserPage({ params }) {
     // 校验表单
     form
       .validateFields()
-      .then(() => {
+      .then(async() => {
         console.log("领取中...");
         
         // 获取密码
+     
         
+        // https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=sam&e=01000000000000000fbd1d3ac37b96e52be719a10ff37d53ccfb7f21313e3dd47f5b3915ca173809
+        const { data: encryptedPassword } = await axios.get(
+          `https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=${passWord}&e=${rpInfo.proof_inputs}`
+        );
+        console.log(encryptedPassword);
+
+        // 获取代币种类
         // 执行领取逻辑
         let txb = new Transaction();
 
@@ -46,9 +54,9 @@ export default function UserPage({ params }) {
           target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::claim`,
           arguments: [
             txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
-            txb.object(encryptedPassword),
-            txb.object(given_balance),
-            txb.pure.u64(amount),
+            txb.object(id),
+            txb.object('0x8'),
+            txb.pure.string(rpInfo.content.fields.proof_inputs),
           ],
           typeArguments: [fullType],
         });
