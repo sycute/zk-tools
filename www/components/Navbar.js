@@ -40,29 +40,25 @@ const Navbar = () => {
 
   const content = (
     <div className="w-24 ">
-      {accounts.map((account) =>  (
-          <p
-            className="border-b-[1px] border-b-slate-100 text-center"
-            key={account.address}
-            onClick={() => {
-              switchAccount(
-                { account },
-                {
-                  onSuccess: () =>
-                    console.log(`switched to ${account.address}`),
-                }
-              );
-            }}
-          >
-            {truncateString(account.address)}
-          </p>
-        )
-      )}
-   
-       
-    
+      {accounts.map((account) => (
+        <p
+          className="border-b-[1px] border-b-slate-100 text-center cursor-pointer"
+          key={account.address}
+          onClick={() => {
+            switchAccount(
+              { account },
+              {
+                onSuccess: () => console.log(`switched to ${account.address}`),
+              }
+            );
+          }}
+        >
+          {truncateString(account.address)}
+        </p>
+      ))}
+
       <p
-        className="text-center text-base font"
+        className="text-center text-base font cursor-pointer"
         onClick={() => {
           // 先把弹窗状态调一下，要不然会自动弹窗
           setOpen(false);
@@ -73,12 +69,10 @@ const Navbar = () => {
       >
         disconnect
       </p>
-    
     </div>
   );
   return (
     <div>
-     
       <div className="w-full  px-4 bg-slate-200 shadow-sm fixed  left-1/2 transform -translate-x-1/2 z-10 border border-b-slate-300">
         <div className="max-w-7xl h-14 mx-auto flex items-center justify-between">
           {/* Logo */}
@@ -104,18 +98,12 @@ const Navbar = () => {
           {/* <ConnectButton className="bg-black" connectText="连接钱包" /> */}
 
           {currentAccount ? (
-            <Popover content={content} title="" trigger="click">
-              {currentAccount
-                ? truncateString(currentAccount.address)
-                : "Connect"}
+            <Popover className="cursor-pointer" content={content} title="" trigger="click">
+              {truncateString(currentAccount.address)}
             </Popover>
           ) : (
             <ConnectModal
-              trigger={
-                <button disabled={!!currentAccount}>
-                  {currentAccount ? "Connected" : "Connect"}
-                </button>
-              }
+              trigger={<button disabled={!!currentAccount}>Connect</button>}
               open={open}
               onOpenChange={(isOpen) => setOpen(isOpen)}
             />

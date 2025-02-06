@@ -14,7 +14,7 @@ export default function UserPage({ params }) {
   const [rpInfo, setRpInfo] = useState();
   const [passWord, setPassWord] = useState(""); //口令
   const [fullType, setFullType] = useState(""); //红包类型
-
+  const account = useCurrentAccount();
   const [form] = Form.useForm();
   // 从 params 中获取动态路由参数
   const { id } = use(params);
@@ -38,11 +38,13 @@ export default function UserPage({ params }) {
   }, []);
 
   const handleClaim = () => {
+    if(!account) return alert("请先连接钱包");
     // 校验表单
     form
       .validateFields()
       .then(async () => {
         console.log("领取中...");
+ 
         // 获取密码
         // https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=sam&e=01000000000000000fbd1d3ac37b96e52be719a10ff37d53ccfb7f21313e3dd47f5b3915ca173809
         const { data: encryptedPassword } = await axios.get(
@@ -66,14 +68,15 @@ export default function UserPage({ params }) {
         });
 
         // 执行
-        let res = executeTx(txb);
+        let res =await executeTx(txb);
+        
         console.log(res);
       })
       .catch((e) => {
         console.error(e);
       });
 
-    console.log("领取");
+   
   };
   return (
     <div>
