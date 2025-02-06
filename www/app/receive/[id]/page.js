@@ -79,7 +79,7 @@ export default function UserPage({ params }) {
     <div>
       {/* 信息展示 */}
       <div className="min-h-screen  mx-2 rounded-2xl relative pb-56 pt-24">
-        <div className="w-[400px] h-48 bg-slate-50 mx-auto mt-48 p-6   rounded-2xl shadow-lg text-center">
+        <div className="w-[400px] h-48 bg-slate-50 mx-auto mt-20 p-6   rounded-2xl shadow-lg text-center">
           {/* <div>id:{truncateString(rpInfo?.id.id)}</div>
           <div>balance:{rpInfo?.balance}</div>
           <div>sender:{truncateString(rpInfo?.sender)}</div>
