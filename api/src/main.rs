@@ -7,6 +7,7 @@ use salvo::{
 #[shuttle_runtime::main]
 async fn salvo() -> shuttle_salvo::ShuttleSalvo {
     let cors = Cors::new()
+        .allow_headers(AllowHeaders::any())
         .allow_origin(AllowOrigin::any())
         .allow_methods(AllowMethods::any())
         .allow_headers(AllowHeaders::any());

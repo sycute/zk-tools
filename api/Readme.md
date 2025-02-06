@@ -2,7 +2,7 @@
 
 ### 1. 创建口令
 
-公开：output = hash(hash(口令))
+公开：output = zk(hash(口令))
 证明：知晓隐私数据 hash(口令)
 
 ### 3. 部署
@@ -12,7 +12,7 @@
 发送 GET https://psw-gift-2xvg.shuttle.app/zkrpnew?e=sam
 这里的`sam`就是口令密码，返回字符串
 
-领取 GET https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=sam&e=01000000000000000fbd1d3ac37b96e52be719a10ff37d53ccfb7f21313e3dd47f5b3915ca173809
+领取 GET https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=sam&e=0fbd1d3ac37b96e52be719a10ff37d53ccfb7f21313e3dd47f5b3915ca173809
 这里的`g`就是之前的口令密码，`e`是上个接口返回的字符串
 
 Sui 测试网
