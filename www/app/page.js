@@ -98,10 +98,10 @@ export default function Home() {
       {/* 选择Coin */}
       <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto    flex flex-col justify-around items-center rounded-2xl shadow-lg bg-slate-50">
         <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">
-          Create a Stash
+          Create a Red Packet
         </div>
         {Object.keys(chosedCoin).length == 0 && (
-          <div>Choose one or more assets to send in the stash.</div>
+          <div>Choose one assets to send in the red packet</div>
         )}
         {Object.keys(chosedCoin).length > 0 && (
           <div className="bg-black rounded-3xl p-4 w-full">
@@ -150,7 +150,7 @@ export default function Home() {
                   ]}
                 >
                   <InputNumber
-                    className=" border-gray-500"
+                    className=" border-gray-200"
                     min={0}
                     max={9999}
                     parser={(text) => (/^\d+$/.test(text) ? text : 1)}
@@ -173,7 +173,7 @@ export default function Home() {
                   ]}
                 >
                   <Input
-                    className=" border-gray-500"
+                    className=" border-gray-200"
                     onChange={(e) => {
                       setPassWord(e.target.value);
                     }}

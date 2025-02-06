@@ -64,6 +64,7 @@ const Navbar = () => {
       <p
         className="text-center text-base font"
         onClick={() => {
+          // 先把弹窗状态调一下，要不然会自动弹窗
           setOpen(false);
           setTimeout(() => {
             disconnect();
