@@ -36,8 +36,7 @@ export function useTransactionExecution() {
 
       return res;
     } catch (e) {
-      console.log(e);
-
+      console.error(e);
     }
   };
 
