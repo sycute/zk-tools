@@ -32,7 +32,7 @@ export function useTransactionExecution() {
         },
       });
 
-      console.log('success');
+      console.log(res);
 
       return res;
     } catch (e) {
