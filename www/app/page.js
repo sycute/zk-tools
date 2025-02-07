@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "@/components/Navbar.js";
+import Link from "next/link";
 import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
 import { Drawer, Form, Input, Row, Col, InputNumber } from "antd";
 import { useState } from "react";
@@ -7,9 +7,11 @@ import { useState } from "react";
 import { Transaction } from "@mysten/sui/transactions";
 import { useTransactionExecution } from "@/api/useTransactionExecution.js";
 import axios from "axios";
+import { TESTNET_REDPACKSTORE_OBJECT_ID } from "@/components/networkConfig.js";
 
 // 修改元数据
 import DrawBody from "@/components/drawBody.js";
+import RpList from "@/components/rpList.js";
 import { getCoins, combineCoins, splitCoins } from "@/api/suiData.js";
 import { TESTNET_ZKREDPACK_PACKAGE_ID } from "@/components/networkConfig.js";
 export default function Home() {
@@ -41,7 +43,7 @@ export default function Home() {
     setCoinInfo(val);
   };
 
-  const send =  () => {
+  const send = () => {
     form
       .validateFields()
       .then(async () => {
@@ -75,12 +77,10 @@ export default function Home() {
           txb.moveCall({
             target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
             arguments: [
-              txb.object(
-                "0x80011863aba3e88fb5f975ef124bd3bf3340398625a9372b52d583d012bcac17"
-              ),
+              txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
               txb.object(given_balance),
               txb.pure.u64(amount),
-              txb.object(encryptedPassword),
+              txb.pure.string(encryptedPassword),
             ],
             typeArguments: [fullType],
           });
@@ -94,18 +94,14 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="h-screen bg-white m-2 rounded-2xl relative"
-      style={{ backgroundImage: 'url("/image/bg.jpg")' }}
-    >
-      <Navbar />
+    <div className="min-h-screen   relative pb-56 pt-24">
       {/* 选择Coin */}
-      <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto mt-40 border-8 rounded-3xl border-black flex flex-col justify-around items-center bg-white">
+      <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto    flex flex-col justify-around items-center rounded-2xl shadow-lg bg-slate-50">
         <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">
-          Create a Stash
+          Create a Red Packet
         </div>
         {Object.keys(chosedCoin).length == 0 && (
-          <div>Choose one or more assets to send in the stash.</div>
+          <div>Choose one assets to send in the red packet</div>
         )}
         {Object.keys(chosedCoin).length > 0 && (
           <div className="bg-black rounded-3xl p-4 w-full">
@@ -144,7 +140,7 @@ export default function Home() {
             <Row>
               <Col span={10} className="mr-8">
                 <Form.Item
-                name="amount"
+                  name="amount"
                   label="红包数量"
                   rules={[
                     {
@@ -154,7 +150,7 @@ export default function Home() {
                   ]}
                 >
                   <InputNumber
-                    className=" border-gray-500"
+                    className=" border-gray-200"
                     min={0}
                     max={9999}
                     parser={(text) => (/^\d+$/.test(text) ? text : 1)}
@@ -177,7 +173,7 @@ export default function Home() {
                   ]}
                 >
                   <Input
-                    className=" border-gray-500"
+                    className=" border-gray-200"
                     onChange={(e) => {
                       setPassWord(e.target.value);
                     }}
@@ -191,13 +187,13 @@ export default function Home() {
         {/* 底部按钮 */}
         <div className="w-full flex justify-center items-center  bottom-4">
           <button
-            className="flex-1 h-10 rounded-full border  bg-black hover:bg-black/90 text-white text-sm font-medium transition-colors mr-4"
+            className="flex-1 h-10 rounded-full border  bg-slate-200  hover:bg-slate-300 text-slate-500 hover:text-slate-600 text-sm font-semibold transition-colors mr-4"
             onClick={showDrawer}
           >
             CHOOSE COINS
           </button>
           <button
-            className="flex-1 h-10 rounded-full  border-gray-200 bg-gray-100 hover:bg-gray-200  text-sm font-medium transition-colors disabled:bg-gray-50 disabled:text-gray-300 disabled:cursor-not-allowed"
+            className="flex-1 h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-500 hover:text-slate-600  text-sm font-semibold transition-colors disabled:bg-slate-100  disabled:text-gray-300 disabled:cursor-not-allowed"
             disabled={Object.keys(chosedCoin).length == 0}
             onClick={send}
           >
@@ -219,6 +215,8 @@ export default function Home() {
           setOpen={setOpen}
         />
       </Drawer>
+
+      <RpList />
     </div>
   );
 }
