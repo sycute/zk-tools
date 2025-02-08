@@ -1,0 +1,11 @@
+
+
+ .btn:disabled:hover{
+    background-color: #F1F5F9 !important;
+    color: #D1D5DC !important;
+ }
+
+ .btn:hover{
+    background-color: #CAD5E2 !important;
+    color: #45556C !important;
+ }
