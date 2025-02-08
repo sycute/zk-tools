@@ -31,13 +31,10 @@ export function useTransactionExecution() {
           showObjectChanges: true,
         },
       });
-
       console.log(res);
-
       return res;
     } catch (e) {
-      console.log(e);
-
+      console.error(e);
     }
   };
 

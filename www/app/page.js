@@ -1,8 +1,17 @@
 "use client";
-import Link from "next/link";
+import "./MyBtn.css";
 import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
-import { Drawer, Form, Input, Row, Col, InputNumber } from "antd";
-import { useState } from "react";
+import {
+  Drawer,
+  Form,
+  Input,
+  Row,
+  Col,
+  InputNumber,
+  message,
+  Button,
+} from "antd";
+import { useState, useRef } from "react";
 // import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { Transaction } from "@mysten/sui/transactions";
 import { useTransactionExecution } from "@/api/useTransactionExecution.js";
@@ -16,11 +25,15 @@ import { getCoins, combineCoins, splitCoins } from "@/api/suiData.js";
 import { TESTNET_ZKREDPACK_PACKAGE_ID } from "@/components/networkConfig.js";
 export default function Home() {
   const [open, setOpen] = useState(false); //抽屉开关
+  const rpListChild = useRef(null);
   const [amount, setAmount] = useState(0); // 红包数量
   const [passWord, setPassWord] = useState(""); //口令
   const [coinInfo, setCoinInfo] = useState({});
+  const [loading, setLoading] = useState(false); // 加载状态
+
   // 这个数据原来是一个数组，后来改成最多只有一个。下面的循环没有改所以看起来冗余
   const [chosedCoin, setChosedCoin] = useState({});
+  const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const client = useSuiClient();
   const currentAccount = useCurrentAccount();
@@ -44,57 +57,88 @@ export default function Home() {
   };
 
   const send = () => {
+    
     form
       .validateFields()
       .then(async () => {
-        let txb = new Transaction();
-        // 获取口令加密字符串
-        const { data: encryptedPassword } = await axios.get(
-          `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${passWord}`
-        );
-        console.log(encryptedPassword);
-
-        Object.keys(chosedCoin).forEach(async (type) => {
-          let fullType = coinInfo[type].fullType;
-          let coins = await getCoins(client, currentAccount, fullType);
-
-          let given_balance;
-          if (fullType == "0x2::sui::SUI") {
-            given_balance = txb.splitCoins(txb.gas, [0.05 * 10 ** 9]);
-          } else {
-            await combineCoins(txb, coins, fullType);
-            // 分割代币
-            given_balance = await splitCoins(
-              txb,
-              coins[0],
-              fullType,
-              amount,
-              coinInfo[type].decimals
-            );
-          }
-
-          // 发送红包数据
-          txb.moveCall({
-            target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
-            arguments: [
-              txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
-              txb.object(given_balance),
-              txb.pure.u64(amount),
-              txb.pure.string(encryptedPassword),
-            ],
-            typeArguments: [fullType],
+        setLoading(true);
+        try{
+          let txb = new Transaction();
+          // 获取口令加密字符串
+          const { data: encryptedPassword } = await axios.get(
+            `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${passWord}`
+          );
+          console.log("encryptedPassword==>",encryptedPassword);
+  
+          Object.keys(chosedCoin).forEach(async (type) => {
+            let fullType = coinInfo[type].fullType;
+            let coins = await getCoins(client, currentAccount, fullType);
+  
+            let given_balance;
+            if (fullType == "0x2::sui::SUI") {
+              given_balance = txb.splitCoins(txb.gas, [0.05 * 10 ** 9]);
+            } else {
+              await combineCoins(txb, coins, fullType);
+              // 分割代币
+              given_balance = await splitCoins(
+                txb,
+                coins[0],
+                fullType,
+                amount,
+                coinInfo[type].decimals
+              );
+            }
+  
+            // 发送红包数据
+            txb.moveCall({
+              target: `${TESTNET_ZKREDPACK_PACKAGE_ID}::happyrp::create_rp`,
+              arguments: [
+                txb.object(TESTNET_REDPACKSTORE_OBJECT_ID),
+                txb.object(given_balance),
+                txb.pure.u64(amount),
+                txb.pure.string(encryptedPassword),
+              ],
+              typeArguments: [fullType],
+            });
+            let res = await executeTx(txb);
+            console.log(res);
+            if(res){
+              messageApi.open({
+                type: "success",
+                content: "claimed successfully!",
+              });
+            }else{
+              messageApi.error({
+                type: "error",
+                content: "claimed failed!",
+              });
+            }
+            setLoading(false);
+            // 刷新红包列表
+            setTimeout(()=>{
+              rpListChild.current?.getRcinfo();
+            },1000)
+            
           });
-          let res = executeTx(txb);
-          console.log(res);
-        });
+      
+        }catch(e){
+          console.log(e);
+          messageApi.error({
+            type: "failed",
+            content: "send failed!",
+          });
+          setLoading(false);
+        }   
       })
-      .catch(() => {
-        console.log(false);
-      });
+
+   
+    
   };
 
   return (
     <div className="min-h-screen   relative pb-56 pt-24">
+      {contextHolder}
+     
       {/* 选择Coin */}
       <div className="w-3/4 max-w-[800px] px-10  h-96 mx-auto    flex flex-col justify-around items-center rounded-2xl shadow-lg bg-slate-50">
         <div className="font-aeonik text-[28px] text-fill-content-primary font-bold -tracking-[0.01em]">
@@ -192,13 +236,14 @@ export default function Home() {
           >
             CHOOSE COINS
           </button>
-          <button
-            className="flex-1 h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-500 hover:text-slate-600  text-sm font-semibold transition-colors disabled:bg-slate-100  disabled:text-gray-300 disabled:cursor-not-allowed"
+          <Button
+            className="btn flex-1 h-10 rounded-full bg-slate-200  text-slate-500    text-sm font-semibold transition-colors disabled:bg-slate-100  disabled:text-gray-300 disabled:cursor-not-allowed border-none "
             disabled={Object.keys(chosedCoin).length == 0}
             onClick={send}
+            loading={loading}
           >
             SEND
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -216,7 +261,7 @@ export default function Home() {
         />
       </Drawer>
 
-      <RpList />
+      <RpList ref={rpListChild} />
     </div>
   );
 }
