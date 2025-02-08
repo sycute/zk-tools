@@ -30,7 +30,6 @@ const nav = [
 ];
 const Navbar = () => {
   const currentAccount = useCurrentAccount();
-  console.log(currentAccount?.address);
 
   const { mutate: disconnect } = useDisconnectWallet();
   const { mutate: switchAccount } = useSwitchAccount();

@@ -86,7 +86,6 @@ const DrawBody = (props) => {
   // 取消
   const cancel = () => {
     props.setOpen(false);
-    console.log("取消");
   };
 
   const submit = () => {
@@ -130,7 +129,6 @@ const DrawBody = (props) => {
               const balance = checkNaN(
                 (item?.balance - 0) / 10 ** coinInfo[item.type]?.decimals
               );
-              console.log(balance);
               return balance;
             }
 

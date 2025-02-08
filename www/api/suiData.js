@@ -11,8 +11,6 @@ export const getCoins = async (client, currentAccount, coinType) => {
 export const combineCoins = async (txb,coins, coinType) => {
   if (coins.length < 2) return;
   let idList = coins.map((i) => {
-    console.log(i.coinObjectId);
-    
     return i.coinObjectId;
   });
 
@@ -26,8 +24,6 @@ export const combineCoins = async (txb,coins, coinType) => {
 };
 
 export const splitCoins = async (txb,coin, coinType, amount, decimals) => {
-  console.log(coin, coinType, amount, decimals);
-
   const given_coin = txb.moveCall({
     target: "0x2::coin::split",
     arguments: [

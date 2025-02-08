@@ -24,6 +24,7 @@ export default function UserPage({ params }) {
   const [rpInfo, setRpInfo] = useState();
   const [passWord, setPassWord] = useState(""); //口令
   const [fullType, setFullType] = useState(""); //红包类型
+  const [loading, setLoading] = useState(false); // 加载状态
   const account = useCurrentAccount();
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
@@ -39,6 +40,12 @@ export default function UserPage({ params }) {
       options: { showContent: true },
     });
     console.log(data);
+    // 红包已被全部领取，对象为空
+
+    if(!data){
+      setRpInfo(null);
+      return;
+    }
     setRpInfo(data.content.fields);
     const str = data.content.type;
     const match = str.match(/<([^>]+)>/);
@@ -56,13 +63,14 @@ export default function UserPage({ params }) {
       .validateFields()
       .then(async () => {
         console.log("领取中...");
-        try {
+        setLoading(true);
+        try {                                                                                                                             
           // 获取密码
           // https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=sam&e=01000000000000000fbd1d3ac37b96e52be719a10ff37d53ccfb7f21313e3dd47f5b3915ca173809
           const { data: encryptedPassword } = await axios.get(
             `https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=${passWord}&e=${rpInfo.proof_inputs}`
           );
-          console.log(encryptedPassword);
+          console.log("encryptedPassword==>",encryptedPassword);
 
           // 执行领取逻辑
           let txb = new Transaction();
@@ -86,21 +94,24 @@ export default function UserPage({ params }) {
             messageApi.open({
               type: "success",
               content: "claimed successfully!",
+              duration: 0,
             });
             // 返回主页
-            router.push('/')
+            // router.push('/')
           }else{
             messageApi.error({
               type: "error",
               content: "claimed failed!",
             });
           }
+          setLoading(false);
           // 更新数据
           setTimeout(() => {
             getRpInfo();
           }, 1000);
         } catch (e) {
           console.error(e);
+          setLoading(false);
           messageApi.error({
             type: "error",
             content: "claimed failed!",
@@ -119,7 +130,7 @@ export default function UserPage({ params }) {
           <div>balance:{rpInfo?.balance}</div>
           <div>sender:{truncateString(rpInfo?.sender)}</div>
           <div>{rpInfo.claimers.length}/nums</div> */}
-          <div className="grid grid-cols-2 gap-6">
+          {rpInfo === null ? <div className="mt-14" >All red packet have been claimed</div> :  <div className="grid grid-cols-2 gap-6">
             {/* 重点数据 */}
             <div className="space-y-1">
               <div className="text-3xl font-semibold">{rpInfo?.balance}</div>
@@ -145,7 +156,8 @@ export default function UserPage({ params }) {
               </div>
               <div className="text-sm text-gray-500">Sender</div>
             </div>
-          </div>
+          </div>}
+         
         </div>
         {/* 口令输入框 */}
         <Form form={form} className="w-[400px] mx-auto mt-4">
@@ -166,6 +178,7 @@ export default function UserPage({ params }) {
                   onChange={(e) => {
                     setPassWord(e.target.value);
                   }}
+                  disabled={rpInfo === null}
                 />
               </Form.Item>
             </Col>
@@ -174,8 +187,10 @@ export default function UserPage({ params }) {
                 htmlType="submit"
                 className="ml-2 border-none shadow-lg bg-slate-200"
                 onClick={handleClaim}
+                disabled={rpInfo === null}
+                loading={loading}
               >
-                领取
+                Claim
               </Button>
             </Col>
           </Row>

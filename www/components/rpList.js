@@ -12,8 +12,6 @@ const RpList = forwardRef((props, ref) => {
 
   // 获取rc信息，信息中包含了红包的id列表
   const getRcinfo = async () => {
-    console.log(123);
-
     const { data } = await client.getDynamicFields({
       parentId: TESTNET_REDPACKSTORE_OBJECT_ID,
     });
@@ -35,7 +33,6 @@ const RpList = forwardRef((props, ref) => {
   //    获取红包列表
   useEffect(() => {
     const getRpList = async () => {
-      console.log(456);
       const res = await client.multiGetObjects({
         ids: rpIdList,
         options: { showContent: true },

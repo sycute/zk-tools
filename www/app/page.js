@@ -30,6 +30,8 @@ export default function Home() {
   const [amount, setAmount] = useState(0); // 红包数量
   const [passWord, setPassWord] = useState(""); //口令
   const [coinInfo, setCoinInfo] = useState({});
+  const [loading, setLoading] = useState(false); // 加载状态
+
   // 这个数据原来是一个数组，后来改成最多只有一个。下面的循环没有改所以看起来冗余
   const [chosedCoin, setChosedCoin] = useState({});
   const [messageApi, contextHolder] = message.useMessage();
@@ -56,16 +58,18 @@ export default function Home() {
   };
 
   const send = () => {
+    
     form
       .validateFields()
       .then(async () => {
+        setLoading(true);
         try{
           let txb = new Transaction();
           // 获取口令加密字符串
           const { data: encryptedPassword } = await axios.get(
             `https://psw-gift-2xvg.shuttle.app/zkrpnew?e=${passWord}`
           );
-          console.log(encryptedPassword);
+          console.log("encryptedPassword==>",encryptedPassword);
   
           Object.keys(chosedCoin).forEach(async (type) => {
             let fullType = coinInfo[type].fullType;
@@ -110,21 +114,26 @@ export default function Home() {
                 content: "claimed failed!",
               });
             }
-          
+            setLoading(false);
             // 刷新红包列表
             setTimeout(()=>{
               rpListChild.current?.getRcinfo();
             },1000)
+            
           });
+      
         }catch(e){
           console.log(e);
           messageApi.error({
             type: "failed",
             content: "send failed!",
           });
+          setLoading(false);
         }   
       })
+
    
+    
   };
 
   return (
@@ -232,6 +241,7 @@ export default function Home() {
             className="btn flex-1 h-10 rounded-full bg-slate-200  text-slate-500    text-sm font-semibold transition-colors disabled:bg-slate-100  disabled:text-gray-300 disabled:cursor-not-allowed border-none "
             disabled={Object.keys(chosedCoin).length == 0}
             onClick={send}
+            loading={loading}
           >
             SEND
           </Button>
