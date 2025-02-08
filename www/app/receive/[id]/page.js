@@ -4,12 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useSuiClient, useCurrentAccount } from "@mysten/dapp-kit";
 import { truncateString } from "@/utils/util.js";
 import {
-  Drawer,
   Form,
   Input,
   Row,
   Col,
-  InputNumber,
   Button,
   message,
 } from "antd";
@@ -66,7 +64,6 @@ export default function UserPage({ params }) {
         setLoading(true);
         try {                                                                                                                             
           // 获取密码
-          // https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=sam&e=01000000000000000fbd1d3ac37b96e52be719a10ff37d53ccfb7f21313e3dd47f5b3915ca173809
           const { data: encryptedPassword } = await axios.get(
             `https://psw-gift-2xvg.shuttle.app/zkrpclaim?g=${passWord}&e=${rpInfo.proof_inputs}`
           );

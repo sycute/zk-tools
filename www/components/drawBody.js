@@ -1,10 +1,8 @@
 "use client";
 import {
-  useSignTransactionBlock,
+  
   useSuiClient,
   useCurrentAccount,
-  ConnectModal,
-  useSuiClientQuery,
 } from "@mysten/dapp-kit";
 import { useEffect, useState } from "react";
 import { useCoinBalances } from "@/lib/useUserBalance";

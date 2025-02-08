@@ -6,28 +6,12 @@ import {
   useDisconnectWallet,
   useAccounts,
   useSwitchAccount,
-  ConnectButton,
+
 } from "@mysten/dapp-kit";
 import { useState } from "react";
 import { truncateString } from "@/utils/util.js";
-import { Button, Popover, Space } from "antd";
-const nav = [
-  // {
-  //   title: "SEND",
-  //   href: "/send",
-  //   description: "",
-  // },
-  // {
-  //   title: "APPS",
-  //   href: "/receive",
-  //   description: "",
-  // },
-  // {
-  //   title: "HISTORY",
-  //   href: "/",
-  //   description: "",
-  // },
-];
+import {  Popover } from "antd";
+
 const Navbar = () => {
   const currentAccount = useCurrentAccount();
 
@@ -93,9 +77,6 @@ const Navbar = () => {
           </Link>
 
           {/* Wallet Address */}
-
-          {/* <ConnectButton className="bg-black" connectText="连接钱包" /> */}
-
           {currentAccount ? (
             <Popover className="cursor-pointer" content={content} title="" trigger="click">
               {truncateString(currentAccount.address)}
